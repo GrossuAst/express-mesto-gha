@@ -18,8 +18,30 @@ const createCard = (req, res) => {
 
 // удаление карточки
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
+  Card.findByIdAndRemove(req.params._id)
     .then((card) => res.status(200).send({ data: card }))
+    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+};
+
+// поставить лайк
+const putLike = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params._id,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
+  )
+    .then(() => res.status(200))
+    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+};
+
+// убрать лайк
+const unPutLike = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params._id,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
+    .then(() => res.status(200))
     .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
 };
 
@@ -27,4 +49,6 @@ module.exports = {
   getAllCards,
   createCard,
   deleteCard,
+  putLike,
+  unPutLike,
 };
