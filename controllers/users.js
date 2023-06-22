@@ -1,26 +1,31 @@
 // eslint-disable-next-line eol-last
 const User = require('../models/user');
 
+const serverError = { message: 'На сервере произошла ошибка' };
+const statusOk = 200;
+const statusCreated = 201;
+const statusError = 500;
+
 // получение всех пользователей
 const getAllUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .then((users) => res.status(statusOk).send(users))
+    .catch(() => res.status(statusError).send(serverError));
 };
 
 // получение пользователя по id
 const getUserById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .catch(() => res.status(statusError).send(serverError));
 };
 
 // добавление нового пользователя
 const addNewUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(201).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .then((user) => res.status(statusCreated).send({ data: user }))
+    .catch(() => res.status(statusError).send(serverError));
 };
 
 // обновление данных профиля
@@ -32,19 +37,19 @@ const updateProfile = (req, res) => {
     // опции
     { new: true, runValidators: true, upsert: false },
   )
-    .then((user) => res.status(200).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .then((user) => res.status(statusOk).send({ data: user }))
+    .catch(() => res.status(statusError).send(serverError));
 };
 
 // обновление аватарки
 const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(
-    req.params._id,
+    req.user._id,
     { avatar: req.body.avatar },
     { new: true, runValidators: true, upsert: false },
   )
-    .then((user) => res.status(200).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+    .then((user) => res.status(statusOk).send({ data: user }))
+    .catch(() => res.status(statusError).send(serverError));
 };
 
 module.exports = {

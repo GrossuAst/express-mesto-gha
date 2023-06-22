@@ -6,7 +6,7 @@ const { getAllUsers, getUserById, addNewUser, updateProfile, updateAvatar } = re
 router.get('/users', getAllUsers);
 router.get('/users/:id', getUserById);
 router.post('/users', addNewUser);
-router.patch('./users/me', updateProfile);
-router.patch('./users/me/avatar', updateAvatar);
+router.patch('/users/me', updateProfile);
+router.patch('/users/me/avatar', updateAvatar);
 
 module.exports = router;
