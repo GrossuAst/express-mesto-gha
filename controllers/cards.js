@@ -38,7 +38,7 @@ const putLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then(() => res.status(statusOk))
+    .then((card) => res.status(statusOk).send(card))
     // .then(() => console.log(req.params, req.user._id))
     .catch(() => res.status(statusError).send(serverError));
 };
@@ -50,7 +50,7 @@ const unPutLike = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then(() => res.status(statusOk))
+    .then((card) => res.status(statusOk).send(card))
     .catch(() => res.status(statusError).send(serverError));
 };
 
