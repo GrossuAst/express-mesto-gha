@@ -5,6 +5,7 @@ const serverError = { message: 'На сервере произошла ошиб�
 const statusOk = 200;
 const statusCreated = 201;
 const statusError = 500;
+const badRequest = 400;
 
 // получение всех пользователей
 const getAllUsers = (req, res) => {
@@ -17,7 +18,7 @@ const getAllUsers = (req, res) => {
 const getUserById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(statusError).send(serverError));
+    .catch(() => res.status(badRequest).send(serverError));
 };
 
 // добавление нового пользователя
