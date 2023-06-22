@@ -18,7 +18,7 @@ const getAllUsers = (req, res) => {
 const getUserById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(badRequest).send(serverError));
+    .catch(() => res.status(statusError).send(serverError));
 };
 
 // добавление нового пользователя
@@ -26,7 +26,7 @@ const addNewUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.status(statusCreated).send({ data: user }))
-    .catch(() => res.status(statusError).send(serverError));
+    .catch(() => res.status(badRequest).send(serverError));
 };
 
 // обновление данных профиля
