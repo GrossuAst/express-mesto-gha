@@ -5,6 +5,7 @@ const serverError = { message: 'На сервере произошла ошиб�
 const statusOk = 200;
 const statusCreated = 201;
 const statusError = 500;
+const badRequest = 400;
 
 // получение всех карточек
 const getAllCards = (req, res) => {
@@ -19,7 +20,7 @@ const createCard = (req, res) => {
   // console.log(req.user._id);
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(statusCreated).send({ data: card }))
-    .catch(() => res.status(statusError).send(serverError));
+    .catch(() => res.status(badRequest).send(serverError));
 };
 
 // удаление карточки

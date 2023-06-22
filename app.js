@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 // импорт роутов
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
+const notFoundRouter = require('./routes/index');
 
 const { PORT = 3000 } = process.env;
 
@@ -28,5 +29,6 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use(userRoutes);
 app.use(cardRoutes);
+app.use(notFoundRouter);
 
 app.listen(PORT, () => {});

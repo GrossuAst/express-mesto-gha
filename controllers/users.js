@@ -18,7 +18,7 @@ const getAllUsers = (req, res) => {
 const getUserById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(statusError).send(serverError));
+    .catch(() => res.status(badRequest).send(serverError));
 };
 
 // добавление нового пользователя
@@ -39,7 +39,7 @@ const updateProfile = (req, res) => {
     { new: true, runValidators: true, upsert: false },
   )
     .then((user) => res.status(statusOk).send({ data: user }))
-    .catch(() => res.status(statusError).send(serverError));
+    .catch(() => res.status(badRequest).send(serverError));
 };
 
 // обновление аватарки
