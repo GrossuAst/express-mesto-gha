@@ -17,7 +17,13 @@ const getAllUsers = (req, res) => {
 // получение пользователя по id
 const getUserById = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => res.send({ data: user }))
+    // .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send(serverError);
+      }
+      return res.send({ data: user });
+    })
     .catch(() => res.status(badRequest).send(serverError));
 };
 
