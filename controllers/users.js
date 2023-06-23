@@ -1,17 +1,20 @@
 // eslint-disable-next-line eol-last
 const User = require('../models/user');
-
-const serverError = { message: 'На сервере произошла ошибка' };
-const statusOk = 200;
-const statusCreated = 201;
-const statusError = 500;
-const badRequest = 400;
+const {
+  defaultMessage,
+  notFoundMessage,
+  statusOk,
+  statusCreated,
+  defaultErrorStatus,
+  badRequestStatus,
+  notFoundStatus,
+} = require('../utils/constants');
 
 // получение всех пользователей
 const getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(statusOk).send(users))
-    .catch(() => res.status(statusError).send(serverError));
+    .catch(() => res.status(defaultErrorStatus).send(defaultMessage));
 };
 
 // получение пользователя по id
@@ -20,11 +23,11 @@ const getUserById = (req, res) => {
     // .then((user) => res.send({ data: user }))
     .then((user) => {
       if (!user) {
-        return res.status(404).send(serverError);
+        return res.status(notFoundStatus).send(notFoundMessage);
       }
-      return res.send({ data: user });
+      return res.status(statusOk).send({ data: user });
     })
-    .catch(() => res.status(badRequest).send(serverError));
+    .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
 // добавление нового пользователя
@@ -32,7 +35,7 @@ const addNewUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => res.status(statusCreated).send({ data: user }))
-    .catch(() => res.status(badRequest).send(serverError));
+    .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
 // обновление данных профиля
@@ -45,7 +48,7 @@ const updateProfile = (req, res) => {
     { new: true, runValidators: true, upsert: false },
   )
     .then((user) => res.status(statusOk).send({ data: user }))
-    .catch(() => res.status(badRequest).send(serverError));
+    .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
 // обновление аватарки
@@ -56,7 +59,7 @@ const updateAvatar = (req, res) => {
     { new: true, runValidators: true, upsert: false },
   )
     .then((user) => res.status(statusOk).send({ data: user }))
-    .catch(() => res.status(statusError).send(serverError));
+    .catch(() => res.status(defaultErrorStatus).send(defaultMessage));
 };
 
 module.exports = {

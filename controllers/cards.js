@@ -1,17 +1,20 @@
 // eslint-disable-next-line eol-last
 const Card = require('../models/card');
-
-const serverError = { message: 'На сервере произошла ошибка' };
-const statusOk = 200;
-const statusCreated = 201;
-const statusError = 500;
-const badRequest = 400;
+const {
+  defaultMessage,
+  notFoundMessage,
+  statusOk,
+  statusCreated,
+  defaultErrorStatus,
+  badRequestStatus,
+  notFoundStatus,
+} = require('../utils/constants');
 
 // получение всех карточек
 const getAllCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(statusOk).send(cards))
-    .catch(() => res.status(statusError).send(serverError));
+    .catch(() => res.status(defaultErrorStatus).send(defaultMessage));
 };
 
 // создание карточки
@@ -20,15 +23,19 @@ const createCard = (req, res) => {
   // console.log(req.user._id);
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(statusCreated).send({ data: card }))
-    .catch(() => res.status(badRequest).send(serverError));
+    .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
 // удаление карточки
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => res.status(statusOk).send({ data: card }))
-    // .then(() => console.log(req.user._id, req.params.cardId))
-    .catch(() => res.status(statusError).send(serverError));
+    .then((card) => {
+      if (!card) {
+        return res.status(notFoundStatus).send(notFoundMessage);
+      }
+      return res.status(statusOk).send(card);
+    })
+    .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
 // поставить лайк
@@ -38,9 +45,15 @@ const putLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.status(statusOk).send(card))
-    // .then(() => console.log(req.params, req.user._id))
-    .catch(() => res.status(statusError).send(serverError));
+    .then((card) => {
+      if (!card) {
+        return res.status(notFoundStatus).send(notFoundMessage);
+      }
+      return res.status(statusOk).send(card);
+    })
+    .catch(() => {
+      res.status(badRequestStatus).send(defaultMessage);
+    });
 };
 
 // убрать лайк
@@ -50,8 +63,13 @@ const unPutLike = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.status(statusOk).send(card))
-    .catch(() => res.status(statusError).send(serverError));
+    .then((card) => {
+      if (!card) {
+        return res.status(notFoundStatus).send(notFoundMessage);
+      }
+      return res.status(statusOk).send(card);
+    })
+    .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
 module.exports = {
