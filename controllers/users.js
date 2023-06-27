@@ -1,4 +1,6 @@
-// eslint-disable-next-line eol-last
+/* eslint-disable object-curly-newline */
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const {
   defaultMessage,
@@ -31,11 +33,30 @@ const getUserById = (req, res) => {
 };
 
 // добавление нового пользователя
+// eslint-disable-next-line consistent-return
 const addNewUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(statusCreated).send({ data: user }))
-    .catch(() => res.status(badRequestStatus).send(defaultMessage));
+  const { name, about, avatar, email, password } = req.body;
+  if (validator.isEmail(email)) {
+    return bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+        name, about, avatar, email, password: hash,
+      }))
+      .then((user) => res.status(statusCreated).send({ data: user }))
+      .catch(() => res.status(401).send({ message: 'Такой пользователь уже существует' }));
+  }
+  return res.status(badRequestStatus).send({ message: 'Введите существующий email' });
+  // bcrypt.hash(password, 10)
+  //   .then((hash) => {
+  //     if (validator.email) {
+  //       return User.create({
+  //         name, about, avatar, email, password: hash,
+  //       }.then((user) => res.status(statusCreated).send({ data: user })));
+  //     }
+  //     return res.status(badRequestStatus).send({ message: 'Введите правильную почту' });
+  //   })
+  // User.create({ name, about, avatar, email, password })
+  // .then((user) => res.status(statusCreated).send({ data: user }))
+  // .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
 // обновление данных профиля
