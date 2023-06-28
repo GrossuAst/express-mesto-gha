@@ -1,14 +1,13 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const express = require('express');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const mongoose = require('mongoose');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const bodyParser = require('body-parser');
 
 // импорт роутов
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const nonExistenRoutes = require('./routes/nonExistenRoutes');
+const registerRouter = require('./routes/register');
+const loginRouter = require('./routes/login');
 
 const { PORT = 3000 } = process.env;
 
@@ -29,6 +28,8 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use(userRoutes);
 app.use(cardRoutes);
+app.use(registerRouter);
+app.use(loginRouter);
 app.use(nonExistenRoutes);
 
 app.listen(PORT, () => {});

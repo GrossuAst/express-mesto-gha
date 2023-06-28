@@ -1,6 +1,9 @@
 /* eslint-disable object-curly-newline */
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/user');
 const {
   defaultMessage,
@@ -33,7 +36,6 @@ const getUserById = (req, res) => {
 };
 
 // добавление нового пользователя
-// eslint-disable-next-line consistent-return
 const addNewUser = (req, res) => {
   const { name, about, avatar, email, password } = req.body;
   if (validator.isEmail(email)) {
@@ -44,19 +46,23 @@ const addNewUser = (req, res) => {
       .then((user) => res.status(statusCreated).send({ data: user }))
       .catch(() => res.status(401).send({ message: 'Такой пользователь уже существует' }));
   }
+  if (!email || !password) {
+    return res.status(badRequestStatus).send({ message: 'Введите email и пароль' });
+  }
   return res.status(badRequestStatus).send({ message: 'Введите существующий email' });
-  // bcrypt.hash(password, 10)
-  //   .then((hash) => {
-  //     if (validator.email) {
-  //       return User.create({
-  //         name, about, avatar, email, password: hash,
-  //       }.then((user) => res.status(statusCreated).send({ data: user })));
-  //     }
-  //     return res.status(badRequestStatus).send({ message: 'Введите правильную почту' });
-  //   })
-  // User.create({ name, about, avatar, email, password })
-  // .then((user) => res.status(statusCreated).send({ data: user }))
-  // .catch(() => res.status(badRequestStatus).send(defaultMessage));
+};
+
+// логин
+const login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'что-то', { expiresIn: '7d' });
+      res.status(statusOk).cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
 };
 
 // обновление данных профиля
@@ -87,6 +93,7 @@ module.exports = {
   getAllUsers,
   getUserById,
   addNewUser,
+  login,
   updateProfile,
   updateAvatar,
 };
