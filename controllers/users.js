@@ -54,14 +54,14 @@ const addNewUser = (req, res) => {
 
 // логин
 const login = (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.headers;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'что-то', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, 'key', { expiresIn: '7d' });
       res.status(statusOk).cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
+    .catch(() => {
+      res.status(401).send({ message: 'Ошика' });
     });
 };
 
