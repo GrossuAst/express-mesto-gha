@@ -6,8 +6,7 @@ module.exports = (req, res, next) => {
   if (!auth || !auth.startsWith('Bearer ')) {
     return res.status(401).send({ message: 'Необходима авторизация' });
   }
-  const token = auth.replace('Bearer ');
-  // const payload = jwt.verify(token, 'key');
+  const token = auth.replace('Bearer ', '');
   let payload;
   try {
     payload = jwt.verify(token, 'key');

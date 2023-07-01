@@ -3,6 +3,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
+// const authorization = require('../middlewares/auth');
 
 const User = require('../models/user');
 const {
@@ -35,6 +36,18 @@ const getUserById = (req, res) => {
     .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
+// информация о текущем пользователе
+const getInfoAboutMe = (req, res) => {
+  User.findOne(req.user._id)
+    .then((user) => {
+      if (!user) {
+        return res.status(notFoundStatus).send(notFoundMessage);
+      }
+      return res.status(statusOk).send({ data: user });
+    })
+    .catch(() => res.status(badRequestStatus).send(defaultMessage));
+};
+
 // добавление нового пользователя
 const addNewUser = (req, res) => {
   const { name, about, avatar, email, password } = req.body;
@@ -54,9 +67,10 @@ const addNewUser = (req, res) => {
 
 // логин
 const login = (req, res) => {
-  const { email, password } = req.headers;
+  const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
+      // console.log(user);
       const token = jwt.sign({ _id: user._id }, 'key', { expiresIn: '7d' });
       res.status(statusOk).cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
     })
@@ -92,6 +106,7 @@ const updateAvatar = (req, res) => {
 module.exports = {
   getAllUsers,
   getUserById,
+  getInfoAboutMe,
   addNewUser,
   login,
   updateProfile,
