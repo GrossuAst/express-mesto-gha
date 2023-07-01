@@ -38,7 +38,7 @@ const getUserById = (req, res) => {
 
 // информация о текущем пользователе
 const getInfoAboutMe = (req, res) => {
-  User.findOne(req.user._id)
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         return res.status(notFoundStatus).send(notFoundMessage);
@@ -70,9 +70,9 @@ const login = (req, res) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      // console.log(user);
       const token = jwt.sign({ _id: user._id }, 'key', { expiresIn: '7d' });
       res.status(statusOk).cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).end();
+      // res.status(200).send({ token });
     })
     .catch(() => {
       res.status(401).send({ message: 'Ошика' });

@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const cookieParser = require('cookie-parser');
 
 // импорт роутов
 const nonExistenRoutes = require('./routes/nonExistenRoutes');
@@ -19,6 +21,8 @@ mongoose.connect('mongodb://127.0.0.1/mestodb', {
 });
 
 app.use(bodyParser.json());
+app.use(cookieParser());
+
 app.use(registerRouter);
 app.use(loginRouter);
 app.use(auth);
