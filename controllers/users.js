@@ -83,9 +83,10 @@ const addNewUser = (req, res, next) => {
   if (!validator.isEmail(email)) {
     throw new BadRequestError('Введите существующий email');
   }
-  if (User.find(email)) {
-    throw new BadRequestError('Такой пользователь уже существует');
-  }
+  // if (User.findOne(email)) {
+  // return res.status(400).send({ message: 'Такой пользователь существует' });
+  // throw new BadRequestError('Такой пользователь уже существует');
+  // }
   return bcrypt.hash(password, 10)
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
