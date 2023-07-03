@@ -10,9 +10,12 @@ const cookieParser = require('cookie-parser');
 const nonExistenRoutes = require('./routes/nonExistenRoutes');
 const registerRouter = require('./routes/register');
 const loginRouter = require('./routes/login');
-const auth = require('./middlewares/auth');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
+
+// мидлвэры
+const auth = require('./middlewares/auth');
+const errorsHandler = require('./middlewares/errorsHandler');
 
 const { PORT = 3000 } = process.env;
 
@@ -29,5 +32,7 @@ app.use(auth);
 app.use(userRoutes);
 app.use(cardRoutes);
 app.use(nonExistenRoutes);
+
+app.use(errorsHandler);
 
 app.listen(PORT, () => {});

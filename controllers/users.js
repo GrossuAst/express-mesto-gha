@@ -15,6 +15,7 @@ const {
   badRequestStatus,
   notFoundStatus,
 } = require('../utils/constants');
+const BadRequestError = require('../errors/bad-request-error');
 
 // получение всех пользователей
 const getAllUsers = (req, res) => {
@@ -49,20 +50,48 @@ const getInfoAboutMe = (req, res) => {
 };
 
 // добавление нового пользователя
-const addNewUser = (req, res) => {
+// const addNewUser = (req, res) => {
+//   const { name, about, avatar, email, password } = req.body;
+//   if (validator.isEmail(email)) {
+//     return bcrypt.hash(password, 10)
+//       .then((hash) => User.create({
+//         name, about, avatar, email, password: hash,
+//       }))
+//       .then((user) => res.status(statusCreated).send({ data: user }))
+//       .catch(() => res.status(401).send({ message: 'Такой пользователь уже существует' }));
+//   }
+// if (name.length || email.length < 2) {
+//   return res.status(badRequestStatus).send({ message: 'dasssss' });
+// }
+//   if (!email || !password) {
+//     return res.status(badRequestStatus).send({ message: 'Введите email и пароль' });
+//   }
+//   return res.status(badRequestStatus).send({ message: 'Введите существующий email' });
+// };
+
+const addNewUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
-  if (validator.isEmail(email)) {
-    return bcrypt.hash(password, 10)
-      .then((hash) => User.create({
-        name, about, avatar, email, password: hash,
-      }))
-      .then((user) => res.status(statusCreated).send({ data: user }))
-      .catch(() => res.status(401).send({ message: 'Такой пользователь уже существует' }));
+  if (name.length < 2 || name.length > 30) {
+    throw new BadRequestError('Имя должно содержать от 2 до 30 символов');
+  }
+  if (about.length < 2 || about.length > 30) {
+    throw new BadRequestError('Поле "о себе" должно содержать от 2 до 30 символов');
   }
   if (!email || !password) {
-    return res.status(badRequestStatus).send({ message: 'Введите email и пароль' });
+    throw new BadRequestError('Введите email и пароль');
   }
-  return res.status(badRequestStatus).send({ message: 'Введите существующий email' });
+  if (!validator.isEmail(email)) {
+    throw new BadRequestError('Введите существующий email');
+  }
+  if (User.find(email)) {
+    throw new BadRequestError('Такой пользователь уже существует');
+  }
+  return bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({ name, about, avatar, email, password: hash })
+        .then((user) => res.status(statusCreated).send({ data: user }));
+    })
+    .catch(next);
 };
 
 // логин
