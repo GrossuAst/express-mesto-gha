@@ -35,7 +35,7 @@ app.use(userRoutes);
 app.use(cardRoutes);
 app.use(nonExistenRoutes);
 
-app.use(errors());
 app.use(errorsHandler);
+app.use(errors());
 
 app.listen(PORT, () => {});
