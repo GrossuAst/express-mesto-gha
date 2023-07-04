@@ -49,26 +49,6 @@ const getInfoAboutMe = (req, res) => {
     .catch(() => res.status(badRequestStatus).send(defaultMessage));
 };
 
-// добавление нового пользователя
-// const addNewUser = (req, res) => {
-//   const { name, about, avatar, email, password } = req.body;
-//   if (validator.isEmail(email)) {
-//     return bcrypt.hash(password, 10)
-//       .then((hash) => User.create({
-//         name, about, avatar, email, password: hash,
-//       }))
-//       .then((user) => res.status(statusCreated).send({ data: user }))
-//       .catch(() => res.status(401).send({ message: 'Такой пользователь уже существует' }));
-//   }
-// if (name.length || email.length < 2) {
-//   return res.status(badRequestStatus).send({ message: 'dasssss' });
-// }
-//   if (!email || !password) {
-//     return res.status(badRequestStatus).send({ message: 'Введите email и пароль' });
-//   }
-//   return res.status(badRequestStatus).send({ message: 'Введите существующий email' });
-// };
-
 const addNewUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
   if (name.length < 2 || name.length > 30) {
@@ -98,24 +78,6 @@ const addNewUser = (req, res, next) => {
         });
     })
     .catch(next);
-  // удалить после ревью
-  // return User.findOne(email)
-  //   .then((user) => {
-  //     if (user) {
-  //       throw new BadRequestError('Такой пользователь уже существует');
-  //     }
-  //     return bcrypt.hash(password, 10)
-  //       .then((hash) => User.create({ name, about, avatar, email, password: hash })
-  //         .then((user) => res.status(statusCreated).send({ data: user })));
-  //   };
-  // );
-
-  // return bcrypt.hash(password, 10)
-  //   .then((hash) => {
-  //     User.create({ name, about, avatar, email, password: hash })
-  //       .then((user) => res.status(statusCreated).send({ data: user }));
-  //   })
-  //   .catch(next);
 };
 
 // логин
