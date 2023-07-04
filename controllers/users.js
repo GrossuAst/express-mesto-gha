@@ -16,6 +16,7 @@ const {
   notFoundStatus,
 } = require('../utils/constants');
 const BadRequestError = require('../errors/bad-request-error');
+const ConflictError = require('../errors/conflict-error');
 
 // получение всех пользователей
 const getAllUsers = (req, res) => {
@@ -67,7 +68,7 @@ const addNewUser = (req, res, next) => {
   return User.findOne({ email })
     .then((user) => {
       if (user) {
-        throw new BadRequestError('Такой пользователь уже существует');
+        throw new ConflictError('Такой пользователь уже существует');
       }
       return bcrypt.hash(password, 10)
         .then((hash) => {
