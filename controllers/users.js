@@ -84,12 +84,38 @@ const addNewUser = (req, res, next) => {
     throw new BadRequestError('Введите существующий email');
   }
 
-  return bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({ name, about, avatar, email, password: hash })
-        .then((user) => res.status(statusCreated).send({ data: user }));
+  return User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new BadRequestError('Такой пользователь уже существует');
+      }
+      return bcrypt.hash(password, 10)
+        .then((hash) => {
+          User.create({ name, about, avatar, email, password: hash })
+            .then((newUser) => {
+              res.status(statusCreated).send({ data: newUser });
+            });
+        });
     })
     .catch(next);
+  // удалить после ревью
+  // return User.findOne(email)
+  //   .then((user) => {
+  //     if (user) {
+  //       throw new BadRequestError('Такой пользователь уже существует');
+  //     }
+  //     return bcrypt.hash(password, 10)
+  //       .then((hash) => User.create({ name, about, avatar, email, password: hash })
+  //         .then((user) => res.status(statusCreated).send({ data: user })));
+  //   };
+  // );
+
+  // return bcrypt.hash(password, 10)
+  //   .then((hash) => {
+  //     User.create({ name, about, avatar, email, password: hash })
+  //       .then((user) => res.status(statusCreated).send({ data: user }));
+  //   })
+  //   .catch(next);
 };
 
 // логин
