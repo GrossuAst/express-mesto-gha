@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const cookieParser = require('cookie-parser');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const { errors } = require('celebrate');
 
 // импорт роутов
 const nonExistenRoutes = require('./routes/nonExistenRoutes');
@@ -33,6 +35,7 @@ app.use(userRoutes);
 app.use(cardRoutes);
 app.use(nonExistenRoutes);
 
+app.use(errors());
 app.use(errorsHandler);
 
 app.listen(PORT, () => {});

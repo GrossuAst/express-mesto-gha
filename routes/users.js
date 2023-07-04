@@ -1,6 +1,9 @@
 const router = require('express').Router();
-// eslint-disable-next-line object-curly-newline
-const { getAllUsers,
+// eslint-disable-next-line import/no-extraneous-dependencies
+// const { celebrate, Joi } = require('celebrate');
+
+const {
+  getAllUsers,
   getUserById,
   getInfoAboutMe,
   updateProfile,
