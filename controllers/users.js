@@ -40,7 +40,7 @@ const getUserById = (req, res) => {
 };
 
 // информация о текущем пользователе
-const getInfoAboutMe = (req, res) => {
+const getInfoAboutMe = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
@@ -48,38 +48,28 @@ const getInfoAboutMe = (req, res) => {
       }
       return res.status(statusOk).send({ data: user });
     })
-    .catch(() => res.status(badRequestStatus).send(defaultMessage));
+    .catch(next);
 };
 
 const addNewUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
-  if (name.length < 2 || name.length > 30) {
-    throw new BadRequestError('Имя должно содержать от 2 до 30 символов');
-  }
-  if (about.length < 2 || about.length > 30) {
-    throw new BadRequestError('Поле "о себе" должно содержать от 2 до 30 символов');
-  }
-  if (!email || !password) {
-    throw new BadRequestError('Введите email и пароль');
-  }
+  // if (name.length < 2 || name.length > 30) {
+  //   throw new BadRequestError('Имя должно содержать от 2 до 30 символов');
+  // }
+  // if (about.length < 2 || about.length > 30) {
+  //   throw new BadRequestError('Поле "о себе" должно содержать от 2 до 30 символов');
+  // }
+  // if (!email || !password) {
+  //   throw new BadRequestError('Введите email и пароль');
+  // }
   if (!validator.isEmail(email)) {
     throw new BadRequestError('Введите существующий email');
   }
-
   return User.findOne({ email })
     .then((user) => {
       if (user) {
         throw new ConflictError('Такой пользователь уже существует');
       }
-      // if (!name || !about || !avatar) {
-      //   return bcrypt.hash(password, 10)
-      //     .then((hash) => {
-      //       User.create({ email, password: hash })
-      //         .then((newUser) => {
-      //           res.status(statusCreated).send({ data: newUser });
-      //         });
-      //     });
-      // }
       return bcrypt.hash(password, 10)
         .then((hash) => {
           User.create({ name, about, avatar, email, password: hash })
