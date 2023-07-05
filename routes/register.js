@@ -9,9 +9,7 @@ router.post('/signup', celebrate({
     password: Joi.string().required().min(5),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri({
-      scheme: /^(http|https):\/\/cs[0-9]+\.[a-zA-Z0-9]+\.me\/[^.]+/,
-    }),
+    avatar: Joi.string().uri(),
   }),
 }), addNewUser);
 
