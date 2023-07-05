@@ -9,6 +9,8 @@ const {
   badRequestStatus,
   notFoundStatus,
 } = require('../utils/constants');
+const forbiddenError = require('../errors/forbidden');
+const notFoundError = require('../errors/not-found-error');
 
 // получение всех карточек
 const getAllCards = (req, res) => {
@@ -31,11 +33,17 @@ const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        return res.status(notFoundStatus).send(notFoundMessage);
+        // eslint-disable-next-line new-cap
+        throw new notFoundError('Такой карточки не существует');
+      }
+      if (card.owner !== req.user._id) {
+        // eslint-disable-next-line new-cap
+        throw new forbiddenError('Вы не можете удалить эту карточку');
       }
       return res.status(statusOk).send(card);
     })
-    .catch(() => res.status(badRequestStatus).send(defaultMessage));
+    // eslint-disable-next-line no-undef
+    .catch(next);
 };
 
 // поставить лайк
