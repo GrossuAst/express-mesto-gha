@@ -53,12 +53,6 @@ const getInfoAboutMe = (req, res, next) => {
 
 const addNewUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
-  // if (name.length < 2 || name.length > 30) {
-  //   throw new BadRequestError('Имя должно содержать от 2 до 30 символов');
-  // }
-  // if (about.length < 2 || about.length > 30) {
-  //   throw new BadRequestError('Поле "о себе" должно содержать от 2 до 30 символов');
-  // }
   if (!email || !password) {
     throw new BadRequestError('Введите email и пароль');
   }

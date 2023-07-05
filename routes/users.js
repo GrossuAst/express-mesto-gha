@@ -17,7 +17,12 @@ router.get('/users/:id', celebrate({
     id: Joi.string().length(24),
   }),
 }), getUserById);
-router.patch('/users/me', updateProfile);
+router.patch('/users/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), updateProfile);
 router.patch('/users/me/avatar', updateAvatar);
 
 module.exports = router;
