@@ -2,21 +2,18 @@
 const Card = require('../models/card');
 const {
   defaultMessage,
-  notFoundMessage,
   statusOk,
   statusCreated,
-  defaultErrorStatus,
   badRequestStatus,
-  notFoundStatus,
 } = require('../utils/constants');
 const ForbiddenError = require('../errors/forbidden');
 const NotFoundError = require('../errors/not-found-error');
 
 // получение всех карточек
-const getAllCards = (req, res) => {
+const getAllCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(statusOk).send(cards))
-    .catch(() => res.status(defaultErrorStatus).send(defaultMessage));
+    .catch(next);
 };
 
 // создание карточки
@@ -49,7 +46,7 @@ const deleteCard = (req, res, next) => {
 };
 
 // поставить лайк
-const putLike = (req, res) => {
+const putLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -57,17 +54,15 @@ const putLike = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(notFoundStatus).send(notFoundMessage);
+        throw new NotFoundError('Такой карточки не существует');
       }
       return res.status(statusOk).send(card);
     })
-    .catch(() => {
-      res.status(badRequestStatus).send(defaultMessage);
-    });
+    .catch(next);
 };
 
 // убрать лайк
-const unPutLike = (req, res) => {
+const unPutLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -75,11 +70,11 @@ const unPutLike = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(notFoundStatus).send(notFoundMessage);
+        throw new NotFoundError('Такой карточки не существует');
       }
       return res.status(statusOk).send(card);
     })
-    .catch(() => res.status(badRequestStatus).send(defaultMessage));
+    .catch(next);
 };
 
 module.exports = {
