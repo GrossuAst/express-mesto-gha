@@ -6,12 +6,12 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  notFoundMessage,
+  // notFoundMessage,
   statusOk,
   statusCreated,
-  notFoundStatus,
+  // notFoundStatus,
 } = require('../utils/constants');
-const BadRequestError = require('../errors/bad-request-error');
+// const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
 const NotFoundError = require('../errors/not-found-error');
 
@@ -40,7 +40,7 @@ const getInfoAboutMe = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        return res.status(notFoundStatus).send(notFoundMessage);
+        throw new NotFoundError('Такого пользователя не существует');
       }
       return res.status(statusOk).send({ data: user });
     })
@@ -50,13 +50,19 @@ const getInfoAboutMe = (req, res, next) => {
 // регистрация пользователя
 const addNewUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
-  return bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({ name, about, avatar, email, password: hash })
-        .then((newUser) => {
-          res.status(statusCreated).send({ data: newUser });
+  return User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new ConflictError('Такой пользователь уже существует');
+      }
+      return bcrypt.hash(password, 10)
+        .then((hash) => {
+          User.create({ name, about, avatar, email, password: hash })
+            .then((newUser) => {
+              res.status(statusCreated).send({ data: newUser });
+            });
         })
-        .catch(() => { throw new ConflictError('Пользователь уже существует'); });
+        .catch((err) => { console.log(err); });
     })
     .catch(next);
 };
