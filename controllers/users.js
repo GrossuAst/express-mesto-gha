@@ -50,18 +50,13 @@ const getInfoAboutMe = (req, res, next) => {
 // регистрация пользователя
 const addNewUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
-  return User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        throw new ConflictError('Такой пользователь уже существует');
-      }
-      return bcrypt.hash(password, 10)
-        .then((hash) => {
-          User.create({ name, about, avatar, email, password: hash })
-            .then((newUser) => {
-              res.status(statusCreated).send({ data: newUser });
-            });
-        });
+  return bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({ name, about, avatar, email, password: hash })
+        .then((newUser) => {
+          res.status(statusCreated).send({ data: newUser });
+        })
+        .catch(() => { throw new ConflictError('Пользователь уже существует'); });
     })
     .catch(next);
 };
@@ -69,14 +64,8 @@ const addNewUser = (req, res, next) => {
 // логин
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    throw new BadRequestError('Введите почту и пароль');
-  }
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      // if (!user) {
-      //   throw new UnauthorizedError('Неправильные почта или пароль');
-      // }
       const token = jwt.sign({ _id: user._id }, 'key', { expiresIn: '7d' });
       res.status(statusOk).cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).send({ jwt: token });
     })
