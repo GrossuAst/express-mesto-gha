@@ -1,5 +1,4 @@
 /* eslint-disable object-curly-newline */
-const validator = require('validator');
 const bcrypt = require('bcryptjs');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
@@ -7,36 +6,33 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  defaultMessage,
   notFoundMessage,
   statusOk,
   statusCreated,
-  defaultErrorStatus,
-  badRequestStatus,
   notFoundStatus,
 } = require('../utils/constants');
 const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
-// const UnauthorizedError = require('../errors/unauthorized-error');
+const NotFoundError = require('../errors/not-found-error');
 
 // получение всех пользователей
-const getAllUsers = (req, res) => {
+const getAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(statusOk).send(users))
-    .catch(() => res.status(defaultErrorStatus).send(defaultMessage));
+    .catch(next);
 };
 
 // получение пользователя по id
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params.id)
     // .then((user) => res.send({ data: user }))
     .then((user) => {
       if (!user) {
-        return res.status(notFoundStatus).send(notFoundMessage);
+        throw new NotFoundError('Такого пользователя не существует');
       }
       return res.status(statusOk).send({ data: user });
     })
-    .catch(() => res.status(badRequestStatus).send(defaultMessage));
+    .catch(next);
 };
 
 // информация о текущем пользователе
@@ -54,12 +50,6 @@ const getInfoAboutMe = (req, res, next) => {
 // регистрация пользователя
 const addNewUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
-  if (!email || !password) {
-    throw new BadRequestError('Введите email и пароль');
-  }
-  if (!validator.isEmail(email)) {
-    throw new BadRequestError('Введите существующий email');
-  }
   return User.findOne({ email })
     .then((user) => {
       if (user) {
@@ -94,7 +84,7 @@ const login = (req, res, next) => {
 };
 
 // обновление данных профиля
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     // данные для обновления
@@ -103,18 +93,18 @@ const updateProfile = (req, res) => {
     { new: true, runValidators: true, upsert: false },
   )
     .then((user) => res.status(statusOk).send({ data: user }))
-    .catch(() => res.status(badRequestStatus).send(defaultMessage));
+    .catch(next);
 };
 
 // обновление аватарки
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { avatar: req.body.avatar },
     { new: true, runValidators: true, upsert: false },
   )
     .then((user) => res.status(statusOk).send({ data: user }))
-    .catch(() => res.status(defaultErrorStatus).send(defaultMessage));
+    .catch(next);
 };
 
 module.exports = {

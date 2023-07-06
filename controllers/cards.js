@@ -1,10 +1,8 @@
 // eslint-disable-next-line eol-last
 const Card = require('../models/card');
 const {
-  defaultMessage,
   statusOk,
   statusCreated,
-  badRequestStatus,
 } = require('../utils/constants');
 const ForbiddenError = require('../errors/forbidden');
 const NotFoundError = require('../errors/not-found-error');
@@ -17,12 +15,12 @@ const getAllCards = (req, res, next) => {
 };
 
 // создание карточки
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   // console.log(req.user._id);
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(statusCreated).send({ data: card }))
-    .catch(() => res.status(badRequestStatus).send(defaultMessage));
+    .catch(next);
 };
 
 // удаление карточки

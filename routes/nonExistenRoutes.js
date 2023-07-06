@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const { notFoundMessage, notFoundStatus } = require('../utils/constants');
+const NotFoundError = require('../errors/not-found-error');
 
 // обработчик несуществующих адресов
-module.exports = router.use('/*', (req, res) => res.status(notFoundStatus).send(notFoundMessage));
+// eslint-disable-next-line no-unused-vars
+module.exports = router.use('/*', (req, res) => { throw new NotFoundError('Такой страницы не существует'); });
