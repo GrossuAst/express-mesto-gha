@@ -17,7 +17,7 @@ const {
 } = require('../utils/constants');
 const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
-const UnauthorizedError = require('../errors/unauthorized-error');
+// const UnauthorizedError = require('../errors/unauthorized-error');
 
 // получение всех пользователей
 const getAllUsers = (req, res) => {
@@ -51,6 +51,7 @@ const getInfoAboutMe = (req, res, next) => {
     .catch(next);
 };
 
+// регистрация пользователя
 const addNewUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
   if (!email || !password) {
@@ -83,9 +84,9 @@ const login = (req, res, next) => {
   }
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new UnauthorizedError('Неправильные почта или пароль');
-      }
+      // if (!user) {
+      //   throw new UnauthorizedError('Неправильные почта или пароль');
+      // }
       const token = jwt.sign({ _id: user._id }, 'key', { expiresIn: '7d' });
       res.status(statusOk).cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).send({ jwt: token });
     })
