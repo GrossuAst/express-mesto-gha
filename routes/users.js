@@ -27,6 +27,11 @@ router.patch('/users/me', celebrate({
   }),
 }), updateProfile);
 
-router.patch('/users/me/avatar', updateAvatar);
+router.patch('/users/me/avatar', celebrate({
+  body: Joi.object().keys({
+    // eslint-disable-next-line no-useless-escape
+    avatar: Joi.string().pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
+  }),
+}), updateAvatar);
 
 module.exports = router;
