@@ -8,6 +8,10 @@ const cookieParser = require('cookie-parser');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { errors } = require('celebrate');
 
+// импорт логгеров
+// eslint-disable-next-line no-unused-vars
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 // импорт роутов
 const nonExistenRoutes = require('./routes/nonExistenRoutes');
 const registerRouter = require('./routes/register');
@@ -28,12 +32,18 @@ mongoose.connect('mongodb://127.0.0.1/mestodb', {
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+// подключение логгера запросов
+app.use(requestLogger);
+
 app.use(registerRouter);
 app.use(loginRouter);
 app.use(auth);
 app.use(userRoutes);
 app.use(cardRoutes);
 app.use(nonExistenRoutes);
+
+// логгер ошибок
+app.use(errorLogger);
 
 app.use(errors());
 app.use(errorsHandler);
